@@ -18,13 +18,19 @@ def get_maximum(array):
     return np.max(array)
 
 
-def get_value_at_maximum(array1, array2):
-    return array1[np.argmax(array2)]
+def get_value_at_maximum(value_array, max_array):
+    return value_array[np.argmax(max_array)]
 
 
-def get_value_at_minimum(array1, array2):
-    return array1[np.argmin(array2)]
+def get_value_at_minimum(value_array, min_array):
+    return value_array[np.argmin(min_array)]
 
+
+def compile_select_data(*arrays):
+    array = []
+    for x in arrays:
+        array.append(x)
+    return array
 
 class Deflection:
     def __init__(self, filename):
@@ -38,7 +44,7 @@ class Deflection:
         self.pull_off_start = 0
         self.pull_off_ends = 0
 
-        self.my_data = np.loadtxt(filename, delimiter=",", skiprows=11, quotechar="\"")
+        self.my_data = np.loadtxt(filename, delimiter=",", skiprows=6, quotechar="\"")
 
         # make necessary arrays
         self.time_array = make_array_from_data(self.my_data, 0)
@@ -48,7 +54,10 @@ class Deflection:
 
         # pull off stuff
         self.find_pull_off()
-        self.strain_to_break = self.sample_width_array[self.pull_off_ends] - self.sample_width_array[self.pull_off_start]
+        self.load_detach = get_value_at_minimum(self.sample_load_array, self.pressure_array)
+        # need to talk to Jeff about how this is calculated
+        # self.strain_to_break = self.sample_width_array[self.pull_off_ends] -
+        # self.sample_width_array[self.pull_off_start]
 
         # sample size stuff
         self.minimum_gap = get_minimum(self.sample_width_array)
@@ -62,6 +71,7 @@ class Deflection:
         # pressure stuff
         self.pressure_at_max_deflection = get_value_at_maximum(self.pressure_array, self.deflection_array)
         self.detach_pressure = get_minimum(self.pressure_array)
+        self.stress_strain_array = self.make_stress_strain_array()
 
         self.full_data_array = self.compile_data()
 
@@ -71,10 +81,22 @@ class Deflection:
             array.append((x/self.area)*0.000001)
         return array
 
+    def make_psi_array(self):
+        array = []
+        for x in self.pressure_array:
+            array.append(x*145.038)
+        return array
+
     def make_deflection_array(self):
         array = []
         for x in self.sample_width_array:
             array.append(((self.width - x)/self.width) * 100)
+        return array
+
+    def make_stress_strain_array(self):
+        array = []
+        for i in range(len(self.deflection_array)):
+            array.append(self.pressure_array[i] * 1000000 * self.deflection_array[i] / 100)
         return array
 
     def find_pull_off(self):
@@ -84,7 +106,7 @@ class Deflection:
                 self.pull_off_start = i
                 i += 1
             elif x > 0 and self.pull_off_start > 0:
-                self.pull_off_ends = i
+                self.pull_off_ends = i-2
                 break
             i += 1
 
@@ -98,5 +120,6 @@ class Deflection:
 
 if __name__ == "__main__":
     # file_name = file_name.split("/")[-1]
-    my_deflection = Deflection(filename="Specimen_RawData_1.csv")
+    my_deflection = Deflection(filename="CN7480_1.0_1.csv")
     # print out data to Excel sheet here
+
