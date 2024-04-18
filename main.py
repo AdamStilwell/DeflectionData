@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 
@@ -28,12 +29,14 @@ def get_value_at_minimum(array1, array2):
 class Deflection:
     def __init__(self, filename):
         # will find a way to get these from the file headers
+        self.sample_name = ""
         self.weight = 2.924
-        self.area = 0.000506707
-        self.pull_off_start = 0
-        self.pull_off_ends = 0
         self.test_speed = 5.0
         self.time_step = 0.1
+
+        self.area = math.pi * (math.pow(0.0127, 2))
+        self.pull_off_start = 0
+        self.pull_off_ends = 0
 
         self.my_data = np.loadtxt(filename, delimiter=",", skiprows=11, quotechar="\"")
 
@@ -42,18 +45,22 @@ class Deflection:
         self.sample_load_array = make_array_from_data(self.my_data, 2)
         self.pressure_array = self.make_pressure_array()
 
+        # pull off stuff
         self.find_pull_off()
         self.strain_to_break = self.sample_width_array[self.pull_off_ends] - self.sample_width_array[self.pull_off_start]
 
+        # sample size stuff
         self.minimum_gap = get_minimum(self.sample_width_array)
-
         self.width = self.sample_width_array[0]
+        self.density = self.calculate_density()
+
+        # deflection stuff
         self.deflection_array = self.make_deflection_array()
         self.max_deflection = get_maximum(self.deflection_array)
-        self.pressure_at_max_deflection = get_value_at_maximum(self.pressure_array, self.deflection_array)
 
+        # pressure stuff
+        self.pressure_at_max_deflection = get_value_at_maximum(self.pressure_array, self.deflection_array)
         self.detach_pressure = get_minimum(self.pressure_array)
-        self.density = self.calculate_density()
 
         self.full_data_array = self.compile_data()
 
@@ -92,4 +99,3 @@ if __name__ == "__main__":
     # file_name = file_name.split("/")[-1]
     my_deflection = Deflection(filename="Specimen_RawData_1.csv")
     # print out data to Excel sheet here
-    print(my_deflection.max_deflection)
