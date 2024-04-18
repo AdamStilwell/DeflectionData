@@ -2,7 +2,30 @@ import numpy as np
 import pandas as pd
 
 
-class Deflection():
+def make_array_from_data(data, num):
+    array = []
+    for x in data:
+        array.append(x[num])
+    return array
+
+
+def get_minimum(array):
+    return np.min(array)
+
+
+def get_maximum(array):
+    return np.max(array)
+
+
+def get_value_at_maximum(array1, array2):
+    return array1[np.argmax(array2)]
+
+
+def get_value_at_minimum(array1, array2):
+    return array1[np.argmin(array2)]
+
+
+class Deflection:
     def __init__(self, filename):
         # will find a way to get these from the file headers
         self.weight = 2.924
@@ -14,29 +37,25 @@ class Deflection():
 
         self.my_data = np.loadtxt(filename, delimiter=",", skiprows=11, quotechar="\"")
 
-        self.sample_width_array = self.make_width_array()
-        self.sample_load_array = self.make_load_array()
+        # make necessary arrays
+        self.sample_width_array = make_array_from_data(self.my_data, 1)
+        self.sample_load_array = make_array_from_data(self.my_data, 2)
         self.pressure_array = self.make_pressure_array()
 
         self.find_pull_off()
+        self.strain_to_break = self.get_strain_to_break()
+
+        self.minimum_gap = get_minimum(self.sample_width_array)
 
         self.width = self.get_sample_width()
         self.deflection_array = self.make_deflection_array()
+        self.max_deflection = get_maximum(self.deflection_array)
+        self.pressure_at_max_deflection = get_value_at_maximum(self.pressure_array, self.deflection_array)
 
-        self.detach_pressure = self.get_detach_pressure()
+        self.detach_pressure = get_minimum(self.pressure_array)
         self.density = self.calculate_density()
 
-    def make_width_array(self):
-        array = []
-        for x in self.my_data:
-            array.append(x[1])
-        return array
-
-    def make_load_array(self):
-        array = []
-        for x in self.my_data:
-            array.append(x[2])
-        return array
+        self.full_data_array = self.compile_data()
 
     def make_pressure_array(self):
         array = []
@@ -61,18 +80,22 @@ class Deflection():
                 break
             i += 1
 
-    def get_detach_pressure(self):
-        return np.min(self.pressure_array)
-
     def get_sample_width(self):
         return self.sample_width_array[0]
+
+    def get_strain_to_break(self):
+        return self.sample_width_array[self.pull_off_ends] - self.sample_width_array[self.pull_off_start]
 
     def calculate_density(self):
         return self.weight/(self.area * self.width) * 0.001
 
+    def compile_data(self):
+        array = [self.sample_width_array, self.sample_load_array, self.deflection_array, self.pressure_array]
+        return array
+
 
 if __name__ == "__main__":
+    # file_name = file_name.split("/")[-1]
     my_deflection = Deflection(filename="Specimen_RawData_1.csv")
-    # print out data to excel sheet here
-    print("test")
-
+    # print out data to Excel sheet here
+    print(my_deflection.max_deflection)
