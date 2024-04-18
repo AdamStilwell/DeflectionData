@@ -43,11 +43,11 @@ class Deflection:
         self.pressure_array = self.make_pressure_array()
 
         self.find_pull_off()
-        self.strain_to_break = self.get_strain_to_break()
+        self.strain_to_break = self.sample_width_array[self.pull_off_ends] - self.sample_width_array[self.pull_off_start]
 
         self.minimum_gap = get_minimum(self.sample_width_array)
 
-        self.width = self.get_sample_width()
+        self.width = self.sample_width_array[0]
         self.deflection_array = self.make_deflection_array()
         self.max_deflection = get_maximum(self.deflection_array)
         self.pressure_at_max_deflection = get_value_at_maximum(self.pressure_array, self.deflection_array)
@@ -79,12 +79,6 @@ class Deflection:
                 self.pull_off_ends = i
                 break
             i += 1
-
-    def get_sample_width(self):
-        return self.sample_width_array[0]
-
-    def get_strain_to_break(self):
-        return self.sample_width_array[self.pull_off_ends] - self.sample_width_array[self.pull_off_start]
 
     def calculate_density(self):
         return self.weight/(self.area * self.width) * 0.001
