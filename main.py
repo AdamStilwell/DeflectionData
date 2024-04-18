@@ -74,4 +74,5 @@ class Deflection():
 if __name__ == "__main__":
     my_deflection = Deflection(filename="Specimen_RawData_1.csv")
     # print out data to excel sheet here
+    print("test")
 
