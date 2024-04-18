@@ -41,6 +41,7 @@ class Deflection:
         self.my_data = np.loadtxt(filename, delimiter=",", skiprows=11, quotechar="\"")
 
         # make necessary arrays
+        self.time_array = make_array_from_data(self.my_data, 0)
         self.sample_width_array = make_array_from_data(self.my_data, 1)
         self.sample_load_array = make_array_from_data(self.my_data, 2)
         self.pressure_array = self.make_pressure_array()
