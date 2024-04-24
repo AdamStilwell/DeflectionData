@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import pandas as pd
+import csv
 
 
 def make_array_from_data(data, num):
@@ -33,10 +34,19 @@ def compile_select_data(*arrays):
     return array
 
 class Deflection:
-    def __init__(self, filename):
+    def __init__(self, filename, headers):
         # will find a way to get these from the file headers
-        self.sample_name = ""
-        self.weight = 2.924
+        lines = []
+        with open("C:\\Users\\wj9618\\PycharmProjects\\pythonProject\\DeflectionData\\CN7480_1.0_1.csv") as infile:
+            reader = csv.reader(infile)
+            for x in range(headers):
+                lines.append(next(reader))
+        print(lines)
+
+        self.sample_name = lines[2][1]
+        # weight = lines[1][1]
+        # will implement the above when the dummy file has an input weight
+        self.weight = 2.9
         self.test_speed = 5.0
         self.time_step = 0.1
 
@@ -44,7 +54,7 @@ class Deflection:
         self.pull_off_start = 0
         self.pull_off_ends = 0
 
-        self.my_data = np.loadtxt(filename, delimiter=",", skiprows=6, quotechar="\"")
+        self.my_data = np.loadtxt(filename, delimiter=",", skiprows=headers, quotechar="\"")
 
         # make necessary arrays
         self.time_array = make_array_from_data(self.my_data, 0)
@@ -120,6 +130,6 @@ class Deflection:
 
 if __name__ == "__main__":
     # file_name = file_name.split("/")[-1]
-    my_deflection = Deflection(filename="CN7480_1.0_1.csv")
+    my_deflection = Deflection(filename="CN7480_1.0_1.csv", headers=6)
     # print out data to Excel sheet here
 
