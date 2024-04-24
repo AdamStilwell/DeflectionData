@@ -1,7 +1,34 @@
 import math
 import numpy as np
 import pandas as pd
+import customtkinter as ctk
 import csv
+
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("dark-blue")
+
+root = ctk.CTk()
+root.geometry("500x350")
+
+
+def upload():
+    print("Test")
+
+
+frame = ctk.CTkFrame(master=root)
+frame.pack(pady=20, padx=60, fill="both", expand=True)
+
+# , text_font=("Helvetica", 24)
+label = ctk.CTkLabel(master=frame, text="Upload")
+label.pack(pady=12, padx=10)
+
+entry1 = ctk.CTkEntry(master=frame, placeholder_text="File to upload")
+entry1.pack(pady=12, padx=10)
+
+button = ctk.CTkButton(master=frame, text="Upload", command=upload)
+button.pack(pady=12, padx=10)
+
+root.mainloop()
 
 
 def make_array_from_data(data, num):
