@@ -37,7 +37,7 @@ class Deflection:
     def __init__(self, filename, headers):
         # will find a way to get these from the file headers
         lines = []
-        with open("C:\\Users\\wj9618\\PycharmProjects\\pythonProject\\DeflectionData\\CN7480_1.0_1.csv") as infile:
+        with open(filename) as infile:
             reader = csv.reader(infile)
             for x in range(headers):
                 lines.append(next(reader))
