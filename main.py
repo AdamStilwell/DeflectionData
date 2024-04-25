@@ -1,5 +1,6 @@
 import pandas as pd
 import customtkinter as ctk
+import xlsxwriter
 from tkinter import filedialog
 
 from DeflectionData.deflection import Deflection
@@ -30,8 +31,26 @@ button.pack(pady=12, padx=10)
 
 if __name__ == "__main__":
     # "CN7480_1.0_1.csv"
-    root.mainloop()
-    my_deflection = Deflection(filename="CN7480_1.0_1.csv", headers_num=6)
+    # root.mainloop()
+
+    filenames = ["CN7480_1.0_1.csv"]
+    deflections = []
+
+    workbook = xlsxwriter.Workbook("test.xlsx")
+    worksheet = workbook.add_worksheet()
+    worksheet.set_column("A:A", 20)
+
+    for filename in filenames:
+        my_deflection = Deflection(filename=filename, headers_num=6)
+        deflections.append(my_deflection)
+        for x in range(len(my_deflection.time_array)):
+            pos = str.join("A", str(x))
+            worksheet.write(pos, my_deflection.headers[0])
+
+    for deflection in deflections:
+        deflection.compile_data()
     # file_name = file_name.split("/")[-1]
     # print out data to Excel sheet here
+
+    workbook.close()
 

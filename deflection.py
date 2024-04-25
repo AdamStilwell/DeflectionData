@@ -36,14 +36,13 @@ def compile_select_data(*arrays):
 class Deflection:
     def __init__(self, filename, headers_num):
         # will find a way to get these from the file headers
-        headers = []
+        self.headers = []
         with open(filename) as infile:
             reader = csv.reader(infile)
             for x in range(headers_num):
-                headers.append(next(reader))
-        print(headers)
+                self.headers.append(next(reader))
 
-        self.sample_name = headers[2][1]
+        self.sample_name = self.headers[2][1]
         # weight = lines[1][1]
         # will implement the above when the dummy file has an input weight
         self.weight = 2.9
