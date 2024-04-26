@@ -42,12 +42,11 @@ class Deflection:
             for x in range(headers_num):
                 self.headers.append(next(reader))
 
-        self.sample_name = self.headers[2][1]
-        # weight = lines[1][1]
-        # will implement the above when the dummy file has an input weight
-        self.weight = 2.9
-        self.test_speed = 5.0
-        self.time_step = 0.1
+        # print(self.headers)
+        self.sample_name = self.headers[1][1]
+        self.weight = float(self.headers[2][1])
+        self.test_force = float(self.headers[3][1])
+        self.test_speed = float(self.headers[4][1])
 
         self.area = math.pi * (math.pow(0.0127, 2))
         self.pull_off_start = 0
@@ -60,6 +59,8 @@ class Deflection:
         self.sample_width_array = make_array_from_data(self.my_data, 1)
         self.sample_load_array = make_array_from_data(self.my_data, 2)
         self.pressure_array = self.make_pressure_array()
+
+        self.time_step = self.time_array[2] - self.time_array[1]
 
         # pull off stuff
         self.find_pull_off()
@@ -123,5 +124,8 @@ class Deflection:
         return self.weight/(self.area * self.width) * 0.001
 
     def compile_data(self):
-        array = [self.sample_width_array, self.sample_load_array, self.deflection_array, self.pressure_array]
+        array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
+                 self.pressure_array]
+        self.headers[-2].append("Deflection")
+        self.headers[-2].append("Pressure")
         return array
