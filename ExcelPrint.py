@@ -21,3 +21,9 @@ def worksheet_raw_print(workbook, my_deflection):
         for i in range(7, len(array)):
             worksheet.write(i, j, array[i])
         j += 1
+
+
+def worksheet_print_graphs(workbook):
+    # find out how to make graphs
+    print("Hello")
+
