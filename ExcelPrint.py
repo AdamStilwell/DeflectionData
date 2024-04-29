@@ -1,5 +1,3 @@
-
-
 def worksheet_raw_print(workbook, my_deflection):
     worksheet = workbook.add_worksheet(my_deflection.sample_name)
     worksheet.set_column("A:A", 10)
