@@ -5,6 +5,7 @@ from tkinter import filedialog
 
 from DeflectionData.deflection import Deflection
 import ExcelPrint
+import workbookCreation
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -46,13 +47,13 @@ button2.pack(pady=12, padx=10)
 
 if __name__ == "__main__":
     root.mainloop()
-    workbook = xlsxwriter.Workbook(save_file_location + "/" + save_file)
+    workbook = workbookCreation.Workbook(save_file_location=save_file_location, save_file=save_file)
 
     for filename in file_path:
         my_deflection = Deflection(filename=filename, headers_num=8)
-        ExcelPrint.worksheet_raw_print(workbook, my_deflection)
+        ExcelPrint.worksheet_raw_print(workbook.workbook, my_deflection)
 
     # print out data to Excel sheet here
 
-    workbook.close()
+    workbook.workbook.close()
 

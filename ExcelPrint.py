@@ -29,3 +29,6 @@ def worksheet_print_graphs(workbook):
     # find out how to make graphs
     print("Hello")
 
+
+def print_summary_worksheet(worksheet):
+    print("World")
