@@ -18,8 +18,10 @@ def worksheet_raw_print(workbook, my_deflection):
     j = 0
     for array in my_deflection.full_data_array:
         worksheet.write(6, j, my_deflection.headers[-2][j])
-        for i in range(7, len(array)):
-            worksheet.write(i, j, array[i])
+        start = 7
+        for i in range(len(array)):
+            worksheet.write(start, j, array[i])
+            start += 1
         j += 1
 
 

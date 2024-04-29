@@ -59,7 +59,8 @@ class Deflection:
         self.sample_width_array = make_array_from_data(self.my_data, 1)
         self.sample_load_array = make_array_from_data(self.my_data, 2)
         self.pressure_array = self.make_pressure_array()
-
+        self.psi_array = self.make_psi_array()
+        self.h_delta_array = self.make_h_delta_array()
         self.time_step = self.time_array[2] - self.time_array[1]
 
         # pull off stuff
@@ -109,6 +110,12 @@ class Deflection:
             array.append(self.pressure_array[i] * 1000000 * self.deflection_array[i] / 100)
         return array
 
+    def make_h_delta_array(self):
+        array = []
+        for x in self.sample_width_array:
+            array.append(self.test_speed/x/1000)
+        return array
+
     def find_pull_off(self):
         i = 0
         for x in self.sample_load_array:
@@ -125,7 +132,10 @@ class Deflection:
 
     def compile_data(self):
         array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
-                 self.pressure_array]
+                 self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array]
         self.headers[-2].append("Deflection")
         self.headers[-2].append("Pressure")
+        self.headers[-2].append("PSI")
+        self.headers[-2].append("Stress * strain")
+        self.headers[-2].append("h_dot/h")
         return array
