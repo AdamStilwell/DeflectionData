@@ -134,9 +134,7 @@ class Deflection:
     def compile_data(self):
         array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
                  self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array]
-        self.headers[-2].append("Deflection")
-        self.headers[-2].append("Pressure")
-        self.headers[-2].append("PSI")
-        self.headers[-2].append("Stress * strain")
-        self.headers[-2].append("h_dot/h")
+        more_headers = ["Deflection", "Pressure", "PSI", "Stress * strain", "h_dot/h"]
+        for x in more_headers:
+            self.headers[-2].append(x)
         return array

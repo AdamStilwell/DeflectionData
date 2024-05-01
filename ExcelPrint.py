@@ -117,6 +117,6 @@ def print_summary_worksheet(worksheet, my_deflection, number_of_sheets):
     worksheet.write(number_of_sheets, 10, "Power Law Index")
     worksheet.write(number_of_sheets, 11, "Offset")
 
-    worksheet.write(number_of_sheets, 12, "FTA-4 equiv.")
-    worksheet.write(number_of_sheets, 13, "G'20 C")
-    worksheet.write(number_of_sheets, 14, "G' 200 C")
+    worksheet.write(number_of_sheets, 12, "")
+    worksheet.write(number_of_sheets, 13, "")
+    worksheet.write(number_of_sheets, 14, "")
