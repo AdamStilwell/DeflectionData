@@ -20,6 +20,7 @@ def upload():
     else:
         save_file = entry1.get() + ".xlsx"
     file_path = filedialog.askopenfilenames(filetypes=[("csv file", ".csv")])
+    root.destroy()
 
 
 def save_location():
@@ -45,10 +46,13 @@ button2.pack(pady=12, padx=10)
 if __name__ == "__main__":
     root.mainloop()
     workbook_class = workbookCreation.Workbook(save_file_location=save_file_location, save_file=save_file)
-
+    number_of_sheets = 1
     for filename in file_path:
         my_deflection = Deflection(filename=filename, headers_num=8)
         ExcelPrint.worksheet_raw_print(workbook_class.workbook, my_deflection)
+        ExcelPrint.print_summary_worksheet(worksheet=workbook_class.worksheet_summary, my_deflection=my_deflection,
+                                           number_of_sheets=number_of_sheets)
+        number_of_sheets += 1
 
     # print out data to Excel sheet here
 

@@ -74,6 +74,7 @@ class Deflection:
         self.minimum_gap = get_minimum(self.sample_width_array)
         self.width = self.sample_width_array[0]
         self.density = self.calculate_density()
+        self.max_load = get_maximum(self.sample_load_array)
 
         # deflection stuff
         self.deflection_array = self.make_deflection_array()
