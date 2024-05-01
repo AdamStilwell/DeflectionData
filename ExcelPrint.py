@@ -22,46 +22,74 @@ def worksheet_raw_print(workbook, my_deflection):
         j += 1
 
     # Pressure vs Gap
-    pressure_gap_chart = workbook.add_chart({"type": "scatter"})
-    insert_values_into_chart(chart=pressure_gap_chart,
-                             data_length=len(my_deflection.deflection_array),
-                             x_col=4,
-                             y_col=1,
-                             sample_name=my_deflection.sample_name)
-    worksheet.insert_chart("J1", pressure_gap_chart,
-                           {"x_scale": 0.65, "y_scale": 0.75})
+    pressure_gap_chart = new_chart_creation(workbook=workbook,
+                                            data_length=len(my_deflection.deflection_array),
+                                            sample_name=my_deflection.sample_name,
+                                            x_col=4,
+                                            y_col=1,
+                                            x_name="Pressure (MPa)",
+                                            y_name="Gap (mm)")
+    insert_chart_into_worksheet(worksheet=worksheet,
+                                chart=pressure_gap_chart,
+                                insert_location="J1")
     # Gap vs Load
-    gap_load_chart = workbook.add_chart({"type": "scatter"})
-    insert_values_into_chart(chart=gap_load_chart,
-                             data_length=len(my_deflection.deflection_array),
-                             x_col=1,
-                             y_col=2,
-                             sample_name=my_deflection.sample_name)
-    worksheet.insert_chart("O1", gap_load_chart,
-                           {"x_scale": 0.65, "y_scale": 0.75})
+    gap_load_chart = new_chart_creation(workbook=workbook,
+                                        data_length=len(my_deflection.deflection_array),
+                                        sample_name=my_deflection.sample_name,
+                                        x_col=1,
+                                        y_col=2,
+                                        x_name="Displacement (mm)",
+                                        y_name="Load (N)")
+    insert_chart_into_worksheet(worksheet=worksheet,
+                                chart=gap_load_chart,
+                                insert_location="O1")
 
     # Pressure vs Deflection
-    pressure_deflection_chart = workbook.add_chart({"type": "scatter"})
-    insert_values_into_chart(chart=pressure_deflection_chart,
-                             data_length=len(my_deflection.deflection_array),
-                             x_col=4,
-                             y_col=3,
-                             sample_name=my_deflection.sample_name)
-    worksheet.insert_chart("J12", pressure_deflection_chart,
-                           {"x_scale": 0.65, "y_scale": 0.75})
+    pressure_deflection_chart = new_chart_creation(workbook=workbook,
+                                                   data_length=len(my_deflection.deflection_array),
+                                                   sample_name=my_deflection.sample_name,
+                                                   x_col=4,
+                                                   y_col=3,
+                                                   x_name="Pressure (MPa)",
+                                                   y_name="Deflection (%)")
+    insert_chart_into_worksheet(worksheet=worksheet,
+                                chart=pressure_deflection_chart,
+                                insert_location="J12")
 
     # Deflection vs Pressure
-    deflection_pressure_chart = workbook.add_chart({"type": "scatter"})
-    insert_values_into_chart(chart=deflection_pressure_chart,
-                             data_length=len(my_deflection.deflection_array),
-                             x_col=3,
-                             y_col=4,
-                             sample_name=my_deflection.sample_name)
-    worksheet.insert_chart("O12", deflection_pressure_chart,
-                           {"x_scale": 0.65, "y_scale": 0.75})
+    deflection_pressure_chart = new_chart_creation(workbook=workbook,
+                                                   data_length=len(my_deflection.deflection_array),
+                                                   sample_name=my_deflection.sample_name,
+                                                   x_col=3,
+                                                   y_col=4,
+                                                   x_name="Strain (%)",
+                                                   y_name="Stress (MPa)")
+    insert_chart_into_worksheet(worksheet=worksheet,
+                                chart=deflection_pressure_chart,
+                                insert_location="O12")
 
     # 1/h vs Pressure
     worksheet.autofit()
+
+
+def insert_chart_into_worksheet(worksheet, chart, insert_location):
+    worksheet.insert_chart(insert_location, chart,
+                           {"x_scale": 0.65, "y_scale": 0.75})
+
+
+def new_chart_creation(workbook, data_length, sample_name, x_col, y_col, x_name, y_name):
+    chart = workbook.add_chart({"type": "scatter", "subtype": "smooth"})
+    insert_values_into_chart(chart, data_length, x_col, y_col, sample_name)
+    chart.set_legend({"none": True})
+    chart.set_x_axis({
+        "name": x_name,
+        "name_font": {"size": 8, "bold": True}
+    })
+    chart.set_y_axis({
+        "name": y_name,
+        "name_font": {"size": 8, "bold": True}
+    })
+    return chart
 
 
 def insert_values_into_chart(chart, data_length, x_col, y_col, sample_name):
@@ -70,7 +98,7 @@ def insert_values_into_chart(chart, data_length, x_col, y_col, sample_name):
         "categories": [sample_name, 7, x_col, data_length, x_col],
         "values": [sample_name, 7, y_col, data_length, y_col],
         "name": sample_name,
-        "line": {"width": 0.25}
+        "line": {"width": 0.75}
     })
 
 
