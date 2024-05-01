@@ -1,16 +1,15 @@
 def worksheet_raw_print(workbook, my_deflection):
     worksheet = workbook.add_worksheet(my_deflection.sample_name)
     worksheet.set_column("A:A", 10)
+    headers = ["Sample name", "Density", "Test force", "Test speed", "Test step"]
+    worksheet.write_column("A1", headers)
 
-    worksheet.write(0, 0, "Sample name")
-    worksheet.write(0, 1, my_deflection.sample_name)
-    worksheet.write(1, 0, "Density")
+    cell_format_string = workbook.add_format()
+    cell_format_string.set_align("right")
+    worksheet.write(0, 1, my_deflection.sample_name, cell_format_string)
     worksheet.write(1, 1, my_deflection.density)
-    worksheet.write(2, 0, "Test force")
     worksheet.write(2, 1, my_deflection.test_force)
-    worksheet.write(3, 0, "Test speed")
     worksheet.write(3, 1, my_deflection.test_speed)
-    worksheet.write(4, 0, "Test step")
     worksheet.write(4, 1, my_deflection.time_step)
 
     j = 0
@@ -21,11 +20,17 @@ def worksheet_raw_print(workbook, my_deflection):
             worksheet.write(start, j, array[i])
             start += 1
         j += 1
+    worksheet.autofit()
 
 
-def worksheet_print_graphs(workbook, chart, x_axis, y_axis):
+def insert_values_into_chart(chart, data_length, x_col, y_col, sample_name):
     # find out how to make graphs
-    print("Hello")
+    chart.add_series({
+        "categories": [sample_name, 7, x_col, data_length, x_col],
+        "values": [sample_name, 7, y_col, data_length, y_col],
+        "name": sample_name,
+        "line": {"width": 0.25}
+    })
 
 
 def print_summary_worksheet(worksheet, my_deflection, number_of_sheets):

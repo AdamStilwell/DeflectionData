@@ -45,13 +45,35 @@ button2.pack(pady=12, padx=10)
 
 if __name__ == "__main__":
     root.mainloop()
-    workbook_class = workbookCreation.Workbook(save_file_location=save_file_location, save_file=save_file)
+    workbook_class = workbookCreation.Workbook(save_file_location=save_file_location,
+                                               save_file=save_file)
     number_of_sheets = 1
     for filename in file_path:
-        my_deflection = Deflection(filename=filename, headers_num=8)
-        ExcelPrint.worksheet_raw_print(workbook_class.workbook, my_deflection)
-        ExcelPrint.print_summary_worksheet(worksheet=workbook_class.worksheet_summary, my_deflection=my_deflection,
+        my_deflection = Deflection(filename=filename,
+                                   headers_num=8)
+        ExcelPrint.worksheet_raw_print(workbook=workbook_class.workbook,
+                                       my_deflection=my_deflection)
+        ExcelPrint.print_summary_worksheet(worksheet=workbook_class.worksheet_summary,
+                                           my_deflection=my_deflection,
                                            number_of_sheets=number_of_sheets)
+        # Pressure-Deflection
+        ExcelPrint.insert_values_into_chart(chart=workbook_class.pressure_deflection_chart,
+                                            data_length=len(my_deflection.sample_load_array),
+                                            x_col=5,
+                                            y_col=3,
+                                            sample_name=my_deflection.sample_name)
+        # Force-Displacement
+        ExcelPrint.insert_values_into_chart(chart=workbook_class.force_displacement_chart,
+                                            data_length=len(my_deflection.sample_load_array),
+                                            x_col=1,
+                                            y_col=2,
+                                            sample_name=my_deflection.sample_name)
+        # Pressure-CompressionRate
+        ExcelPrint.insert_values_into_chart(chart=workbook_class.pressure_compression_rate_chart,
+                                            data_length=len(my_deflection.sample_load_array),
+                                            x_col=7,
+                                            y_col=4,
+                                            sample_name=my_deflection.sample_name)
         number_of_sheets += 1
 
     # print out data to Excel sheet here
