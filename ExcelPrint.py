@@ -4,7 +4,7 @@ def worksheet_raw_print(workbook, my_deflection):
     headers = ["Sample name", "Density", "Test force", "Test speed", "Test step"]
     worksheet.write_column("A1", headers)
 
-    cell_format_string = workbook.add_format()
+    cell_format_string = workbook.add_format({"bold": True})
     cell_format_string.set_align("right")
     worksheet.write(0, 1, my_deflection.sample_name, cell_format_string)
     worksheet.write(1, 1, my_deflection.density)
@@ -14,12 +14,53 @@ def worksheet_raw_print(workbook, my_deflection):
 
     j = 0
     for array in my_deflection.full_data_array:
-        worksheet.write(6, j, my_deflection.headers[-2][j])
+        worksheet.write(6, j, my_deflection.headers[-2][j], cell_format_string)
         start = 7
         for i in range(len(array)):
             worksheet.write(start, j, array[i])
             start += 1
         j += 1
+
+    # Pressure vs Gap
+    pressure_gap_chart = workbook.add_chart({"type": "scatter"})
+    insert_values_into_chart(chart=pressure_gap_chart,
+                             data_length=len(my_deflection.deflection_array),
+                             x_col=4,
+                             y_col=1,
+                             sample_name=my_deflection.sample_name)
+    worksheet.insert_chart("J1", pressure_gap_chart,
+                           {"x_scale": 0.65, "y_scale": 0.75})
+    # Gap vs Load
+    gap_load_chart = workbook.add_chart({"type": "scatter"})
+    insert_values_into_chart(chart=gap_load_chart,
+                             data_length=len(my_deflection.deflection_array),
+                             x_col=1,
+                             y_col=2,
+                             sample_name=my_deflection.sample_name)
+    worksheet.insert_chart("O1", gap_load_chart,
+                           {"x_scale": 0.65, "y_scale": 0.75})
+
+    # Pressure vs Deflection
+    pressure_deflection_chart = workbook.add_chart({"type": "scatter"})
+    insert_values_into_chart(chart=pressure_deflection_chart,
+                             data_length=len(my_deflection.deflection_array),
+                             x_col=4,
+                             y_col=3,
+                             sample_name=my_deflection.sample_name)
+    worksheet.insert_chart("J12", pressure_deflection_chart,
+                           {"x_scale": 0.65, "y_scale": 0.75})
+
+    # Deflection vs Pressure
+    deflection_pressure_chart = workbook.add_chart({"type": "scatter"})
+    insert_values_into_chart(chart=deflection_pressure_chart,
+                             data_length=len(my_deflection.deflection_array),
+                             x_col=3,
+                             y_col=4,
+                             sample_name=my_deflection.sample_name)
+    worksheet.insert_chart("O12", deflection_pressure_chart,
+                           {"x_scale": 0.65, "y_scale": 0.75})
+
+    # 1/h vs Pressure
     worksheet.autofit()
 
 
