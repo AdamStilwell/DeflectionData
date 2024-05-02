@@ -46,11 +46,9 @@ class Deflection:
         self.sample_name = self.headers[1][1]
         self.weight = float(self.headers[2][1])
         self.test_force = float(self.headers[3][1])
-        self.test_speed = float(self.headers[4][1])
+        self.test_speed = float(self.headers[4][1])/1000000
 
         self.area = math.pi * (math.pow(0.0127, 2))
-        self.pull_off_start = 0
-        self.pull_off_ends = 0
 
         self.my_data = np.loadtxt(filename, delimiter=",", skiprows=headers_num, quotechar="\"")
 
@@ -62,13 +60,6 @@ class Deflection:
         self.psi_array = self.make_psi_array()
         self.h_delta_array = self.make_h_delta_array()
         self.time_step = self.time_array[2] - self.time_array[1]
-
-        # pull off stuff
-        self.find_pull_off()
-        self.load_detach = get_value_at_minimum(self.sample_load_array, self.pressure_array)
-        # need to talk to Jeff about how this is calculated
-        # self.strain_to_break = self.sample_width_array[self.pull_off_ends] -
-        # self.sample_width_array[self.pull_off_start]
 
         # sample size stuff
         self.minimum_gap = get_minimum(self.sample_width_array)
@@ -85,24 +76,34 @@ class Deflection:
         self.detach_pressure = get_minimum(self.pressure_array)
         self.stress_strain_array = self.make_stress_strain_array()
 
+        # pull off stuff
+        self.pull_off_start = self.find_pull_off_start()
+        self.pull_off_ends = self.find_pull_off_end()
+        self.load_detach = get_value_at_minimum(self.sample_load_array, self.pressure_array)
+        self.time_at_pull_start = self.time_array[self.pull_off_start]
+        self.time_at_pull_end = self.time_array[self.pull_off_ends]
+        self.strain_to_break = (self.sample_width_array[self.pull_off_ends] -
+                                self.sample_width_array[self.pull_off_start])
+        self.g1c = self.calculate_g1c()
+
         self.full_data_array = self.compile_data()
 
     def make_pressure_array(self):
         array = []
         for x in self.sample_load_array:
-            array.append((x/self.area)*0.000001)
+            array.append((x / self.area) * 0.000001)
         return array
 
     def make_psi_array(self):
         array = []
         for x in self.pressure_array:
-            array.append(x*145.038)
+            array.append(x * 145.038)
         return array
 
     def make_deflection_array(self):
         array = []
         for x in self.sample_width_array:
-            array.append(((self.width - x)/self.width) * 100)
+            array.append(((self.width - x) / self.width) * 100)
         return array
 
     def make_stress_strain_array(self):
@@ -114,22 +115,33 @@ class Deflection:
     def make_h_delta_array(self):
         array = []
         for x in self.sample_width_array:
-            array.append(self.test_speed/x/1000)
+            array.append(self.test_speed / x / 1000)
         return array
 
-    def find_pull_off(self):
-        i = 0
-        for x in self.sample_load_array:
-            if x < 0 and self.pull_off_start == 0:
-                self.pull_off_start = i
+    def find_pull_off_start(self):
+        i = np.argmax(self.sample_load_array)
+        for x in range(i, len(self.stress_strain_array)):
+            if self.stress_strain_array[i] < 0:
+                return i
+            else:
                 i += 1
-            elif x > 0 and self.pull_off_start > 0:
-                self.pull_off_ends = i-2
-                break
-            i += 1
+
+    def find_pull_off_end(self):
+        i = self.pull_off_start
+        for x in range(self.pull_off_start, len(self.stress_strain_array)):
+            if self.stress_strain_array[i] > 0:
+                return i
+            else:
+                i += 1
 
     def calculate_density(self):
-        return self.weight/(self.area * self.width) * 0.001
+        return self.weight / (self.area * self.width) * 0.001
+
+    def calculate_g1c(self):
+        return (sum(self.stress_strain_array[self.pull_off_start:self.pull_off_ends + 1])
+                * self.test_speed
+                * self.time_step
+                * -1)
 
     def compile_data(self):
         array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
