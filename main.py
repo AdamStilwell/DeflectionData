@@ -46,7 +46,8 @@ button2.pack(pady=12, padx=10)
 if __name__ == "__main__":
     root.mainloop()
     workbook_class = workbookCreation.Workbook(save_file_location=save_file_location,
-                                               save_file=save_file)
+                                               save_file=save_file,
+                                               number_of_samples=len(file_path))
     number_of_sheets = 1
     for filename in file_path:
         my_deflection = Deflection(filename=filename,

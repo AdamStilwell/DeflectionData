@@ -14,7 +14,7 @@ class Workbook:
                                {"x_scale": 1.5, "y_scale": 1.5})
         return chart
 
-    def __init__(self, save_file_location, save_file):
+    def __init__(self, save_file_location, save_file, number_of_samples):
         self.workbook = xlsxwriter.Workbook(save_file_location + "/" + save_file)
         # create summary worksheet with all its headings
         self.worksheet_summary = self.workbook.add_worksheet("Summary")
