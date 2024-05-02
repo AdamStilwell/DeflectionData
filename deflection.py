@@ -46,7 +46,7 @@ class Deflection:
         self.sample_name = self.headers[1][1]
         self.weight = float(self.headers[2][1])
         self.test_force = float(self.headers[3][1])
-        self.test_speed = float(self.headers[4][1])/1000000
+        self.test_speed = float(self.headers[4][1])
 
         self.area = math.pi * (math.pow(0.0127, 2))
 
@@ -139,7 +139,7 @@ class Deflection:
 
     def calculate_g1c(self):
         return (sum(self.stress_strain_array[self.pull_off_start:self.pull_off_ends + 1])
-                * self.test_speed
+                * (self.test_speed/1000000)
                 * self.time_step
                 * -1)
 

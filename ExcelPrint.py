@@ -5,20 +5,14 @@ def worksheet_raw_print(workbook, my_deflection):
     worksheet.set_column("A:A", 10)
     headers = ["Sample name", "Density", "Test force", "Test speed", "Test step"]
     worksheet.write_column("A1", headers, cell_format_string)
-    # worksheet.write("C1", "Pull off start", cell_format_string)
-    # worksheet.write("C2", my_deflection.pull_off_start)
-    # worksheet.write("C3", my_deflection.time_at_pull_start)
-    # worksheet.write("D1", "Pull off end", cell_format_string)
-    # worksheet.write("D2", my_deflection.pull_off_ends)
-    # worksheet.write("D3", my_deflection.time_at_pull_end)
 
     cell_format_string = workbook.add_format({"bold": True})
     cell_format_string.set_align("right")
     worksheet.write(0, 1, my_deflection.sample_name, cell_format_string)
     worksheet.write(1, 1, my_deflection.density)
-    worksheet.write(2, 1, my_deflection.test_force)
-    worksheet.write(3, 1, my_deflection.test_speed)
-    worksheet.write(4, 1, my_deflection.time_step)
+    worksheet.write(2, 1, str(my_deflection.test_force) + "N")
+    worksheet.write(3, 1, str(my_deflection.test_speed) + "um")
+    worksheet.write(4, 1, str(my_deflection.time_step) + "s")
 
     j = 0
     for array in my_deflection.full_data_array:
@@ -120,6 +114,7 @@ def print_summary_worksheet(worksheet, my_deflection, number_of_sheets):
     worksheet.write(number_of_sheets, 6, my_deflection.max_deflection)
     worksheet.write(number_of_sheets, 7, my_deflection.minimum_gap)
     worksheet.write(number_of_sheets, 8, my_deflection.strain_to_break)
+
     # power law headings
     worksheet.write(number_of_sheets, 9, "Amplitude")
     worksheet.write(number_of_sheets, 10, "Power Law Index")
