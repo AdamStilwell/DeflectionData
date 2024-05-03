@@ -17,7 +17,7 @@ def upload():
     global file_path
     global save_file
     if entry1.get() == "":
-        save_file = "results.xlsx"
+        save_file = "Results.xlsx"
     else:
         save_file = entry1.get() + ".xlsx"
     file_path = filedialog.askopenfilenames(filetypes=[("csv file", ".csv")])
