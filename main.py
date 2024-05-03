@@ -1,27 +1,21 @@
 import customtkinter as ctk
 from tkinter import filedialog
+import os
 
 from DeflectionData.deflection import Deflection
 import ExcelPrint
 import workbookCreation
 
-
-ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("dark-blue")
-
-root = ctk.CTk()
-root.geometry("500x350")
+save_file_location = "C:\\Users\\" + os.path.expanduser('~').split("\\")[-1] + "\\OneDrive - DuPont\\Desktop"
 
 
 def upload():
-    global file_path
-    global save_file
     if entry1.get() == "":
         save_file = "Results.xlsx"
     else:
         save_file = entry1.get() + ".xlsx"
     file_path = filedialog.askopenfilenames(filetypes=[("csv file", ".csv")])
-    root.destroy()
+    root.after(0, run(save_file=save_file, file_path=file_path))
 
 
 def save_location():
@@ -29,23 +23,7 @@ def save_location():
     save_file_location = filedialog.askdirectory()
 
 
-frame = ctk.CTkFrame(master=root)
-frame.pack(pady=20, padx=60, fill="both", expand=True)
-
-label = ctk.CTkLabel(master=frame, text="Select folder of sample data", font=("Helvetica", 24))
-label.pack(pady=12, padx=10)
-
-entry1 = ctk.CTkEntry(master=frame, placeholder_text="Save File Name")
-entry1.pack(pady=12, padx=10)
-
-button = ctk.CTkButton(master=frame, text="Select Save Location", command=save_location)
-button.pack(pady=12, padx=10)
-
-button2 = ctk.CTkButton(master=frame, text="Select Samples", command=upload)
-button2.pack(pady=12, padx=10)
-
-if __name__ == "__main__":
-    root.mainloop()
+def run(save_file, file_path):
     workbook_class = workbookCreation.Workbook(save_file_location=save_file_location,
                                                save_file=save_file,
                                                number_of_samples=len(file_path))
@@ -77,8 +55,31 @@ if __name__ == "__main__":
                                             y_col=4,
                                             sample_name=my_deflection.sample_name)
         number_of_sheets += 1
-
-    # print out data to Excel sheet here
-
     workbook_class.workbook.close()
+
+
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("dark-blue")
+
+root = ctk.CTk()
+root.geometry("500x350")
+
+frame = ctk.CTkFrame(master=root)
+frame.pack(pady=20, padx=60, fill="both", expand=True)
+
+label = ctk.CTkLabel(master=frame, text="Write save file name,\nchoose save location,\nthen select samples.",
+                     font=("Helvetica", 24))
+label.pack(pady=12, padx=10)
+
+entry1 = ctk.CTkEntry(master=frame, placeholder_text="Save File Name")
+entry1.pack(pady=12, padx=10)
+
+button = ctk.CTkButton(master=frame, text="Select Save Location", command=save_location)
+button.pack(pady=12, padx=10)
+
+button2 = ctk.CTkButton(master=frame, text="Select Samples", command=upload)
+button2.pack(pady=12, padx=10)
+
+if __name__ == "__main__":
+    root.mainloop()
 
