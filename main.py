@@ -81,5 +81,4 @@ if __name__ == "__main__":
     # print out data to Excel sheet here
 
     workbook_class.workbook.close()
-    open(save_file_location + "/" + save_file)
 

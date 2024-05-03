@@ -116,10 +116,9 @@ def print_summary_worksheet(worksheet, my_deflection, number_of_sheets):
     worksheet.write(number_of_sheets, 8, my_deflection.strain_to_break)
 
     # power law headings
-    worksheet.write(number_of_sheets, 9, "Amplitude")
-    worksheet.write(number_of_sheets, 10, "Power Law Index")
-    worksheet.write(number_of_sheets, 11, "Offset")
-
-    worksheet.write(number_of_sheets, 12, "")
-    worksheet.write(number_of_sheets, 13, "")
-    worksheet.write(number_of_sheets, 14, "")
+    # "Amplitude"
+    worksheet.write(number_of_sheets, 9, "")
+    # "Power Law Index"
+    worksheet.write(number_of_sheets, 10, "")
+    # "Offset"
+    worksheet.write(number_of_sheets, 11, "")
