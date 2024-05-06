@@ -127,7 +127,6 @@ class Deflection:
                 i += 1
 
     def find_pull_off_end(self):
-        print(self.detach_pressure)
         target = self.detach_pressure / 10
         start = self.pull_off_start + 1
         i = self.pull_off_start + 1
@@ -142,7 +141,6 @@ class Deflection:
             i += 1
         return pull_off
 
-
     def calculate_density(self):
         return self.weight / (self.area * self.width) * 0.001
 
@@ -156,8 +154,6 @@ class Deflection:
         array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
                  self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array]
         more_headers = ["Deflection", "Pressure", "PSI", "Stress * strain", "h_dot/h"]
-        print(self.pressure_array[self.pull_off_ends])
-        print(self.time_at_pull_end)
         for x in more_headers:
             self.headers[-2].append(x)
         return array

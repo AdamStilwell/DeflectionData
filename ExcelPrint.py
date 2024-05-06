@@ -6,8 +6,6 @@ def worksheet_raw_print(workbook, my_deflection):
     headers = ["Sample name", "Density", "Test force", "Test speed", "Test step"]
     worksheet.write_column("A1", headers, cell_format_string)
 
-    cell_format_string = workbook.add_format({"bold": True})
-    cell_format_string.set_align("right")
     worksheet.write(0, 1, my_deflection.sample_name, cell_format_string)
     worksheet.write(1, 1, my_deflection.density)
     worksheet.write(2, 1, str(my_deflection.test_force) + "N")
