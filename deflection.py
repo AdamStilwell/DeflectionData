@@ -127,19 +127,28 @@ class Deflection:
                 i += 1
 
     def find_pull_off_end(self):
-        i = self.pull_off_start
-        for x in range(self.pull_off_start, len(self.stress_strain_array)):
-            if self.stress_strain_array[i] > 0:
-                return i
-            else:
-                i += 1
+        print(self.detach_pressure)
+        target = self.detach_pressure / 10
+        start = self.pull_off_start + 1
+        i = self.pull_off_start + 1
+        pull_off = 0
+        min_diff = abs(target - self.pressure_array[i])
+
+        for x in range(start, len(self.pressure_array)):
+            diff = abs(self.pressure_array[i] - target)
+            if diff < min_diff:
+                min_diff = diff
+                pull_off = i
+            i += 1
+        return pull_off
+
 
     def calculate_density(self):
         return self.weight / (self.area * self.width) * 0.001
 
     def calculate_g1c(self):
         return (sum(self.stress_strain_array[self.pull_off_start:self.pull_off_ends + 1])
-                * (self.test_speed/1000000)
+                * (self.test_speed / 1000000)
                 * self.time_step
                 * -1)
 
@@ -147,6 +156,8 @@ class Deflection:
         array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
                  self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array]
         more_headers = ["Deflection", "Pressure", "PSI", "Stress * strain", "h_dot/h"]
+        print(self.pressure_array[self.pull_off_ends])
+        print(self.time_at_pull_end)
         for x in more_headers:
             self.headers[-2].append(x)
         return array
