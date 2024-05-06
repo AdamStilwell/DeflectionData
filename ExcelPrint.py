@@ -69,6 +69,17 @@ def worksheet_raw_print(workbook, my_deflection):
                                 insert_location="O12")
 
     # 1/h vs Pressure
+    h_pressure_chart = new_chart_creation(workbook=workbook,
+                                          data_length=len(my_deflection.deflection_array),
+                                          sample_name=my_deflection.sample_name,
+                                          x_col=7,
+                                          y_col=4,
+                                          x_name="1/h*dh/dt (1/s)",
+                                          y_name="Pressure (MPa)")
+    insert_chart_into_worksheet(worksheet=worksheet,
+                                chart=h_pressure_chart,
+                                insert_location="J23")
+
     worksheet.autofit()
 
 
