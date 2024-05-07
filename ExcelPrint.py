@@ -81,18 +81,15 @@ def worksheet_raw_print(workbook, my_deflection):
         "values": [my_deflection.sample_name, 7, 8, len(my_deflection.deflection_array), 8],
         "name": my_deflection.sample_name,
         "line": {"width": 0.75, "color": "orange"},
-        "trendline": {"type": "linear",
-                      "display_equation": True,
-                      "display_r_squared": True}
     })
     insert_chart_into_worksheet(worksheet=worksheet,
                                 chart=h_pressure_chart,
                                 insert_location="K23")
-
-    worksheet.write_column("D1", {"Amplitude", "Power Law Index", "Offset"}, cell_format_string)
+    power_law_strings = ["Amplitude", "Power Law Index", "Offset"]
+    worksheet.write_column("D1", power_law_strings, cell_format_string)
     for i in range(len(my_deflection.power_law_values[0])):
         worksheet.write(("E" + str(i+1)), str(my_deflection.power_law_values[0][i]))
-
+    worksheet.write("E3", str(my_deflection.offset))
     worksheet.autofit()
 
 
@@ -143,4 +140,4 @@ def print_summary_worksheet(worksheet, my_deflection, number_of_sheets):
     # "Power Law Index"
     worksheet.write(number_of_sheets, 10, my_deflection.power_law_values[0][1])
     # "Offset"
-    worksheet.write(number_of_sheets, 11, my_deflection.power_law_values[0][2])
+    worksheet.write(number_of_sheets, 11, my_deflection.offset)

@@ -34,10 +34,6 @@ def compile_select_data(*arrays):
     return array
 
 
-def func(x, a, n, b):
-    return a * pow((x - b), n)
-
-
 class Deflection:
     def __init__(self, filename, headers_num):
         # will find a way to get these from the file headers
@@ -92,11 +88,15 @@ class Deflection:
         self.g1c = self.calculate_g1c()
 
         # power law stuff
+        self.offset = 1 / self.width * self.width / self.time_step / 1000000
         self.power_law_values = []
         self.power_law_calculation()
         self.power_law_array = self.make_power_law_array()
 
         self.full_data_array = self.compile_data()
+
+    def func(self, x, a, n):
+        return a * (x - self.offset) ** n
 
     def make_pressure_array(self):
         array = []
@@ -163,23 +163,24 @@ class Deflection:
     def power_law_calculation(self):
         start_target = 300
         end_target = np.argmax(self.sample_load_array) - 200
-        self.power_law_values = curve_fit(func,
+        self.power_law_values = curve_fit(self.func,
                                           self.h_delta_array[start_target:end_target],
                                           self.pressure_array[start_target:end_target],
-                                          p0=(100, 1, ((self.test_speed / 1000000) / (self.width * 1000))))
+                                          p0=(100, 1),
+                                          maxfev=10000)
 
     def make_power_law_array(self):
         array = []
         for x in self.h_delta_array:
-            array.append(func(x=x,
-                              a=self.power_law_values[0][0],
-                              n=self.power_law_values[0][1],
-                              b=self.power_law_values[0][2]))
+            array.append(self.func(x=x,
+                                   a=self.power_law_values[0][0],
+                                   n=self.power_law_values[0][1]))
         return array
 
     def compile_data(self):
         array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
-                 self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array, self.power_law_array]
+                 self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array,
+                 self.power_law_array]
         more_headers = ["Deflection", "Pressure", "PSI", "Stress * strain", "h_dot/h", "model"]
         for x in more_headers:
             self.headers[-2].append(x)
