@@ -89,7 +89,7 @@ def worksheet_raw_print(workbook, my_deflection):
     worksheet.write_column("D1", power_law_strings, cell_format_string)
     for i in range(len(my_deflection.power_law_values[0])):
         worksheet.write(("E" + str(i+1)), str(my_deflection.power_law_values[0][i]))
-    worksheet.write("E3", str(my_deflection.offset))
+    # worksheet.write("E3", str(my_deflection.offset))
     worksheet.autofit()
 
 
@@ -140,4 +140,4 @@ def print_summary_worksheet(worksheet, my_deflection, number_of_sheets):
     # "Power Law Index"
     worksheet.write(number_of_sheets, 10, my_deflection.power_law_values[0][1])
     # "Offset"
-    worksheet.write(number_of_sheets, 11, my_deflection.offset)
+    worksheet.write(number_of_sheets, 11, my_deflection.power_law_values[0][2])

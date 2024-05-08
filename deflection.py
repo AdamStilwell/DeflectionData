@@ -64,7 +64,7 @@ class Deflection:
 
         # sample size stuff
         self.minimum_gap = get_minimum(self.sample_width_array)
-        self.width = self.sample_width_array[0]
+        self.width = self.find_sample_width()
         self.density = self.calculate_density()
         self.max_load = get_maximum(self.sample_load_array)
 
@@ -89,13 +89,17 @@ class Deflection:
 
         # power law stuff
         self.offset = 1 / self.width * self.width / self.time_step / 1000000
+        print(self.offset)
         self.power_law_values = []
         self.power_law_calculation()
         self.power_law_array = self.make_power_law_array()
 
         self.full_data_array = self.compile_data()
 
-    def func(self, x, a, n, b):
+    def func(self, x, a, n):
+        return a * (x - self.offset) ** n
+
+    def func_2(self, x, a, n, b):
         return a * (x - b) ** n
 
     def make_pressure_array(self):
@@ -151,6 +155,22 @@ class Deflection:
             i += 1
         return pull_off
 
+    def find_sample_width(self):
+        target = 1
+        i = 0
+        min_diff = abs(target - self.sample_load_array[i])
+        width = 0
+        for x in range(300):
+            if self.sample_load_array[i] > 2:
+                break
+            else:
+                diff = abs(self.sample_load_array[i] - target)
+                if diff < min_diff:
+                    min_diff = diff
+                    width = i
+                i += 1
+        return self.sample_width_array[width]
+
     def calculate_density(self):
         return self.weight / (self.area * self.width) * 0.001
 
@@ -161,12 +181,20 @@ class Deflection:
                 * -1)
 
     def power_law_calculation(self):
-        start_target = 500
+        start_target = np.argmax(self.sample_load_array) - 1000
         end_target = np.argmax(self.sample_load_array) - 200
-        self.power_law_values = curve_fit(self.func,
+        power_law_values_first = curve_fit(self.func,
+                                           self.h_delta_array[start_target:end_target],
+                                           self.pressure_array[start_target:end_target],
+                                           p0=(100, 1),
+                                           maxfev=10000)
+
+        self.power_law_values = curve_fit(self.func_2,
                                           self.h_delta_array[start_target:end_target],
                                           self.pressure_array[start_target:end_target],
-                                          p0=(100, 1, self.offset),
+                                          p0=(power_law_values_first[0][0],
+                                              power_law_values_first[0][1],
+                                              self.offset),
                                           bounds=((-np.inf, 0, -np.inf),
                                                   (np.inf, np.inf, get_minimum(self.h_delta_array))),
                                           maxfev=10000)
@@ -174,10 +202,10 @@ class Deflection:
     def make_power_law_array(self):
         array = []
         for x in self.h_delta_array:
-            array.append(self.func(x=x,
-                                   a=self.power_law_values[0][0],
-                                   n=self.power_law_values[0][1],
-                                   b=self.power_law_values[0][2]))
+            array.append(self.func_2(x=x,
+                                     a=self.power_law_values[0][0],
+                                     n=self.power_law_values[0][1],
+                                     b=self.power_law_values[0][2]))
         return array
 
     def compile_data(self):
