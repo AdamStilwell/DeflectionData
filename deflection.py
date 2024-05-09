@@ -89,26 +89,21 @@ class Deflection:
 
         # power law stuff
         self.offset = self.test_speed / self.width / 1000
+        self.power_law_first = []
+        self.power_law_offset = []
         self.power_law_values = []
         self.power_law_calculation()
-        self.power_law_array = self.make_power_law_array()
 
         self.full_data_array = self.compile_data()
 
-    # def func(self, x, a, n):
-    #     return a * (x - self.offset) ** n
+    def func_first(self, x, a, n):
+        return a * (x - self.offset) ** n
 
-    def func_2(self, x, a, n, b):
+    def func(self, x, b):
+        return self.power_law_first[0][0] * (x - b) ** self.power_law_first[0][1]
+
+    def func_final(self, x, a, n, b):
         return a * (x - b) ** n
-
-    def make_model(self, x, a, n, b):
-        # try:
-        value = a * (x - b) ** n
-        # except RuntimeWarning:
-        # value = 0
-        if np.isnan:
-            return 0
-        return value
 
     def make_pressure_array(self):
         array = []
@@ -189,38 +184,32 @@ class Deflection:
                 * -1)
 
     def power_law_calculation(self):
-        start_target = 300
-        end_target = np.argmax(self.sample_load_array) - 200
-        self.power_law_values = curve_fit(self.func_2,
+        # [start_target:end_target]
+        start_target = 210
+        end_target = np.argmax(self.sample_load_array)
+        self.power_law_first = curve_fit(self.func_first,
+                                         self.h_delta_array[start_target:end_target],
+                                         self.pressure_array[start_target:end_target],
+                                         p0=(100, 1),
+                                         maxfev=10000,
+                                         nan_policy="omit")
+        self.power_law_offset = curve_fit(self.func,
                                           self.h_delta_array[start_target:end_target],
                                           self.pressure_array[start_target:end_target],
-                                          p0=(100, 1, self.offset),
+                                          p0=self.offset,
+                                          maxfev=10000,
+                                          nan_policy="omit")
+        self.power_law_values = curve_fit(self.func_final,
+                                          self.h_delta_array[start_target:end_target],
+                                          self.pressure_array[start_target:end_target],
+                                          p0=(self.power_law_first[0][0], self.power_law_first[0][1],
+                                              self.power_law_offset[0][0]),
                                           maxfev=10000,
                                           nan_policy="omit")
 
-        # self.power_law_values = curve_fit(self.func_2,
-        #                                   self.h_delta_array[start_target:end_target],
-        #                                   self.pressure_array[start_target:end_target],
-        #                                   p0=(power_law_values_first[0][0],
-        #                                       power_law_values_first[0][1],
-        #                                       self.offset),
-        #                                   bounds=((-np.inf, 0, -np.inf),
-        #                                           (np.inf, np.inf, get_minimum(self.h_delta_array))),
-        #                                   maxfev=10000)
-
-    def make_power_law_array(self):
-        array = []
-        for x in self.h_delta_array:
-            array.append(self.make_model(x=x,
-                                         a=self.power_law_values[0][0],
-                                         n=self.power_law_values[0][1],
-                                         b=self.power_law_values[0][2]))
-        return array
-
     def compile_data(self):
         array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
-                 self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array,
-                 self.power_law_array]
+                 self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array]
         more_headers = ["Deflection", "Pressure", "PSI", "Stress * strain", "h_dot/h", "model"]
         for x in more_headers:
             self.headers[-2].append(x)

@@ -31,7 +31,9 @@ def worksheet_raw_print(workbook, my_deflection):
                                             y_name="Gap (mm)")
     insert_chart_into_worksheet(worksheet=worksheet,
                                 chart=pressure_gap_chart,
-                                insert_location="K1")
+                                insert_location="K1",
+                                x_size=0.65,
+                                y_size=0.75)
     # Gap vs Load
     gap_load_chart = new_chart_creation(workbook=workbook,
                                         data_length=len(my_deflection.deflection_array),
@@ -42,7 +44,9 @@ def worksheet_raw_print(workbook, my_deflection):
                                         y_name="Load (N)")
     insert_chart_into_worksheet(worksheet=worksheet,
                                 chart=gap_load_chart,
-                                insert_location="P1")
+                                insert_location="P1",
+                                x_size=0.65,
+                                y_size=0.75)
 
     # Pressure vs Deflection
     pressure_deflection_chart = new_chart_creation(workbook=workbook,
@@ -54,7 +58,9 @@ def worksheet_raw_print(workbook, my_deflection):
                                                    y_name="Deflection (%)")
     insert_chart_into_worksheet(worksheet=worksheet,
                                 chart=pressure_deflection_chart,
-                                insert_location="K12")
+                                insert_location="K12",
+                                x_size=0.65,
+                                y_size=0.75)
 
     # Deflection vs Pressure
     deflection_pressure_chart = new_chart_creation(workbook=workbook,
@@ -66,7 +72,9 @@ def worksheet_raw_print(workbook, my_deflection):
                                                    y_name="Stress (MPa)")
     insert_chart_into_worksheet(worksheet=worksheet,
                                 chart=deflection_pressure_chart,
-                                insert_location="P12")
+                                insert_location="P12",
+                                x_size=0.65,
+                                y_size=0.75)
 
     # 1/h vs Pressure
     h_pressure_chart = new_chart_creation(workbook=workbook,
@@ -84,18 +92,30 @@ def worksheet_raw_print(workbook, my_deflection):
     })
     insert_chart_into_worksheet(worksheet=worksheet,
                                 chart=h_pressure_chart,
-                                insert_location="K23")
+                                insert_location="K23",
+                                x_size=1.25,
+                                y_size=1.25)
     power_law_strings = ["Amplitude", "Power Law Index", "Offset"]
     worksheet.write_column("D1", power_law_strings, cell_format_string)
+
     for i in range(len(my_deflection.power_law_values[0])):
         worksheet.write(("E" + str(i+1)), str(my_deflection.power_law_values[0][i]))
-    # worksheet.write("E3", str(my_deflection.offset))
+
+    create_model(worksheet=worksheet,
+                 data_length=len(my_deflection.deflection_array))
     worksheet.autofit()
 
 
-def insert_chart_into_worksheet(worksheet, chart, insert_location):
+def create_model(worksheet, data_length):
+    offset = 8
+    for i in range(0, data_length):
+        worksheet.write("I" + str(i+offset), "=$E$1*(H" + str(i + offset) +
+                        "-$E$3)^$E$2")
+
+
+def insert_chart_into_worksheet(worksheet, chart, insert_location, x_size, y_size):
     worksheet.insert_chart(insert_location, chart,
-                           {"x_scale": 0.65, "y_scale": 0.75})
+                           {"x_scale": x_size, "y_scale": y_size})
 
 
 def new_chart_creation(workbook, data_length, sample_name, x_col, y_col, x_name, y_name):
