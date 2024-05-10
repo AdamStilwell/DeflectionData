@@ -98,9 +98,12 @@ def worksheet_raw_print(workbook, my_deflection):
     power_law_strings = ["Amplitude", "Power Law Index", "Offset"]
     worksheet.write_column("D1", power_law_strings, cell_format_string)
 
+    # write the power law variables
     for i in range(len(my_deflection.power_law_values[0])):
         worksheet.write(("E" + str(i+1)), str(my_deflection.power_law_values[0][i]))
 
+    # write all model stuff
+    worksheet.write("I7", "model", cell_format_string)
     create_model(worksheet=worksheet,
                  data_length=len(my_deflection.deflection_array))
     worksheet.autofit()
