@@ -41,6 +41,10 @@ def compile_select_data(*arrays):
     return array
 
 
+def func_final(x, a, n, b):
+    return a * (x - b) ** n
+
+
 class Deflection:
     def __init__(self, filename, headers_num):
         # will find a way to get these from the file headers
@@ -108,9 +112,6 @@ class Deflection:
 
     def func(self, x, b):
         return self.power_law_first[0] * (x - b) ** self.power_law_first[1]
-
-    def func_final(self, x, a, n, b):
-        return a * (x - b) ** n
 
     def make_pressure_array(self):
         array = []
@@ -203,13 +204,16 @@ class Deflection:
                                      p0=self.offset,
                                      maxfev=1000,
                                      nan_policy="omit")[0]
-        power_law_popt_pcov = curve_fit(self.func_final,
-                                        self.h_delta_array[start:end],
-                                        self.pressure_array[start:end],
-                                        p0=(self.power_law_first[0], self.power_law_first[1],
-                                            power_law_offset[0]),
-                                        maxfev=30000,
-                                        nan_policy="omit")
+        try:
+            power_law_popt_pcov = curve_fit(func_final,
+                                            self.h_delta_array[start:end],
+                                            self.pressure_array[start:end],
+                                            p0=(self.power_law_first[0], self.power_law_first[1],
+                                                power_law_offset[0]),
+                                            maxfev=10000,
+                                            nan_policy="omit")
+        except RuntimeError:
+            return -1
         value = [make_array_from_numpy_array(power_law_popt_pcov, 0),
                  make_array_from_numpy_array(power_law_popt_pcov, 1)]
         perr = np.sqrt(np.diag(power_law_popt_pcov[1]))
@@ -220,15 +224,22 @@ class Deflection:
     def power_law_calculation(self):
         # pick a start point by the power of DEDUCTION
         end = np.argmax(self.sample_load_array)
-        start = end - int(end / 3)
+        start = end - int(end / 7)
         self.curve_fit_func(start=start,
                             end=end)
+        start_min = int(len(self.deflection_array) / 10)
         # loop the curve fit
         while True:
             fit = True
-            start = int(start / 3)
+            start = int(start / 4)
+            if start < start_min:
+                start = start_min
+                fit = False
+
             perr_avg = self.curve_fit_func(start=start,
                                            end=end)
+            if perr_avg == -1:
+                break
             # when perr is greater than the perr of the previous curves end the loop
             for x in self.perr_popt_pcov_dict.keys():
                 if perr_avg > x:
