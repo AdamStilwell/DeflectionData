@@ -93,8 +93,8 @@ class Deflection:
         self.pull_off_start = self.find_pull_off_start()
         self.pull_off_ends = self.find_pull_off_end()
         self.load_detach = get_value_at_minimum(self.sample_load_array, self.pressure_array)
-        print(self.time_array[self.pull_off_start])
-        print(self.time_array[self.pull_off_ends])
+        # print(self.time_array[self.pull_off_start])
+        # print(self.time_array[self.pull_off_ends])
         self.strain_to_break = (self.sample_width_array[self.pull_off_ends] -
                                 self.sample_width_array[self.pull_off_start])
         self.g1c = self.calculate_g1c()
