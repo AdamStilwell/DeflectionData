@@ -98,6 +98,78 @@ class Workbook:
                                   x_col=2,
                                   y_col=6)
 
+        # Experimental Variable 1 vs Thickness
+        self.summary_sheet_charts(worksheet=self.worksheet_summary,
+                                  number_of_samples=number_of_samples,
+                                  chart_offset=3,
+                                  chart_loc="M",
+                                  x_name="Experimental Variable 1",
+                                  y_name="Thickness (mm)",
+                                  title="Thickness vs Experimental Variable 1",
+                                  sheet_name="Summary",
+                                  x_col=15,
+                                  y_col=2)
+
+        # Experimental Variable 1 vs G1c
+        self.summary_sheet_charts(worksheet=self.worksheet_summary,
+                                  number_of_samples=number_of_samples,
+                                  chart_offset=3,
+                                  chart_loc="S",
+                                  x_name="Experimental Variable 1",
+                                  y_name="G1c",
+                                  title="G1c vs Experimental Variable 1",
+                                  sheet_name="Summary",
+                                  x_col=15,
+                                  y_col=4)
+
+        # Experimental Variable 1 vs Peak Detach
+        self.summary_sheet_charts(worksheet=self.worksheet_summary,
+                                  number_of_samples=number_of_samples,
+                                  chart_offset=18,
+                                  chart_loc="M",
+                                  x_name="Experimental Variable 1",
+                                  y_name="Peak Detach (MPa)",
+                                  title="Peak Detach vs Experimental Variable 1",
+                                  sheet_name="Summary",
+                                  x_col=15,
+                                  y_col=5)
+
+        # Experimental Variable 1 vs Max Deflection
+        self.summary_sheet_charts(worksheet=self.worksheet_summary,
+                                  number_of_samples=number_of_samples,
+                                  chart_offset=18,
+                                  chart_loc="S",
+                                  x_name="Experimental Variable 1",
+                                  y_name="Max Deflection (%)",
+                                  title="Thickness vs Experimental Variable 1",
+                                  sheet_name="Summary",
+                                  x_col=15,
+                                  y_col=6)
+
+        # Experimental Variable 1 vs Minimum Gap
+        self.summary_sheet_charts(worksheet=self.worksheet_summary,
+                                  number_of_samples=number_of_samples,
+                                  chart_offset=33,
+                                  chart_loc="M",
+                                  x_name="Experimental Variable 1",
+                                  y_name="Minimum Gap (mm)",
+                                  title="Minimum Gap vs Experimental Variable 1",
+                                  sheet_name="Summary",
+                                  x_col=15,
+                                  y_col=7)
+
+        # Experimental Variable 1 vs Minimum Gap
+        self.summary_sheet_charts(worksheet=self.worksheet_summary,
+                                  number_of_samples=number_of_samples,
+                                  chart_offset=33,
+                                  chart_loc="S",
+                                  x_name="Experimental Variable 1",
+                                  y_name="Distance to Break (um)",
+                                  title="Distance to Break vs Experimental Variable 1",
+                                  sheet_name="Summary",
+                                  x_col=15,
+                                  y_col=8)
+
         self.worksheet_summary.autofit()
 
         self.worksheet_pressure_deflection = self.create_worksheet("Pressure Deflection 450N")

@@ -93,8 +93,8 @@ class Deflection:
         self.pull_off_start = self.find_pull_off_start()
         self.pull_off_ends = self.find_pull_off_end()
         self.load_detach = get_value_at_minimum(self.sample_load_array, self.pressure_array)
-        self.time_at_pull_start = self.time_array[self.pull_off_start]
-        self.time_at_pull_end = self.time_array[self.pull_off_ends]
+        print(self.time_array[self.pull_off_start])
+        print(self.time_array[self.pull_off_ends])
         self.strain_to_break = (self.sample_width_array[self.pull_off_ends] -
                                 self.sample_width_array[self.pull_off_start])
         self.g1c = self.calculate_g1c()
@@ -153,17 +153,14 @@ class Deflection:
 
     def find_pull_off_end(self):
         target = self.detach_pressure / 10
-        start = self.pull_off_start + 1
-        i = self.pull_off_start + 1
+        i = np.argmin(self.pressure_array) + 1
         pull_off = 0
         min_diff = abs(target - self.pressure_array[i])
-
-        for x in range(start, len(self.pressure_array)):
-            diff = abs(self.pressure_array[i] - target)
+        for x in range((np.argmin(self.pressure_array) + 1), len(self.pressure_array)):
+            diff = abs(self.pressure_array[x] - target)
             if diff < min_diff:
                 min_diff = diff
-                pull_off = i
-            i += 1
+                pull_off = x
         return pull_off
 
     def find_sample_width(self):
@@ -186,7 +183,7 @@ class Deflection:
         return self.weight / (self.area * self.width) * 0.001
 
     def calculate_g1c(self):
-        return (sum(self.stress_strain_array[self.pull_off_start:self.pull_off_ends + 1])
+        return (sum(self.stress_strain_array[self.pull_off_start:self.pull_off_ends])
                 * (self.test_speed / 1000000)
                 * self.time_step
                 * -1)
