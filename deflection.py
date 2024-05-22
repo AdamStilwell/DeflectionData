@@ -193,13 +193,15 @@ class Deflection:
                                          self.h_delta_array[start:end],
                                          self.pressure_array[start:end],
                                          p0=(100, 1),
-                                         maxfev=1000,
+                                         maxfev=10000,
+                                         bounds=([0, 0], [np.inf, np.inf]),
                                          nan_policy="omit")[0]
         power_law_offset = curve_fit(self.func,
                                      self.h_delta_array[start:end],
                                      self.pressure_array[start:end],
                                      p0=self.offset,
-                                     maxfev=1000,
+                                     maxfev=10000,
+                                     bounds=([0], [np.inf]),
                                      nan_policy="omit")[0]
         try:
             power_law_popt_pcov = curve_fit(func_final,
@@ -208,6 +210,7 @@ class Deflection:
                                             p0=(self.power_law_first[0], self.power_law_first[1],
                                                 power_law_offset[0]),
                                             maxfev=10000,
+                                            bounds=([0, 0, 0], [np.inf, np.inf, np.inf]),
                                             nan_policy="omit")
         except RuntimeError:
             return -1
@@ -228,7 +231,7 @@ class Deflection:
         # loop the curve fit
         while True:
             fit = True
-            start = int(start / 4)
+            start = int(start / 6)
             if start < start_min:
                 start = start_min
                 fit = False
