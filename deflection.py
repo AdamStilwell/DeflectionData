@@ -91,6 +91,7 @@ class Deflection:
 
         # pull off stuff
         self.pull_off_start = self.find_pull_off_start()
+        self.pull_off_final = self.find_pull_off_final()
         self.pull_off_ends = self.find_pull_off_end()
         self.load_detach = get_value_at_minimum(self.sample_load_array, self.pressure_array)
         # print(self.time_array[self.pull_off_start])
@@ -151,12 +152,17 @@ class Deflection:
             else:
                 i += 1
 
+    def find_pull_off_final(self):
+        for x in range(self.pull_off_start, len(self.pressure_array)):
+            if self.stress_strain_array[x] > 0:
+                return x
+
     def find_pull_off_end(self):
         target = self.detach_pressure / 10
         i = np.argmin(self.pressure_array) + 1
         pull_off = 0
         min_diff = abs(target - self.pressure_array[i])
-        for x in range((np.argmin(self.pressure_array) + 1), len(self.pressure_array)):
+        for x in range((np.argmin(self.pressure_array) + 1), self.pull_off_final):
             diff = abs(self.pressure_array[x] - target)
             if diff < min_diff:
                 min_diff = diff
