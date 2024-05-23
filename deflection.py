@@ -156,6 +156,8 @@ class Deflection:
         for x in range(self.pull_off_start, len(self.pressure_array)):
             if self.stress_strain_array[x] > 0:
                 return x
+            else:
+                return len(self.pressure_array)
 
     def find_pull_off_end(self):
         target = self.detach_pressure / 10

@@ -45,7 +45,7 @@ class Workbook:
         self.worksheet_summary.set_column("A:A", 15)
         headers_array = ["Sample name", "Peak Load (N)", "Thickness (mm)", "Density (g/cc)",
                          "G1c (J/m2)", "Peak Detach Pressure (MPa)", "Maximum % Deflection",
-                         "Minimum Gap (mm)", "Distance to Break (um)", "Amplitude",
+                         "Minimum Gap (mm)", "Distance to Break (mm)", "Amplitude",
                          "Power Law Index", "Offset", "FTA-4 equiv.", "G'20 C", "G' 200 C", "Experiment Variable 1",
                          "Experiment Variable 2"]
         cell_format_string = self.workbook.add_format({"bold": True})
