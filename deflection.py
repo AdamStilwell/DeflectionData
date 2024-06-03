@@ -55,15 +55,16 @@ class Deflection:
                 self.headers.append(next(reader))
 
         # print(self.headers)
-        self.sample_name = self.headers[1][1]
-        self.weight = float(self.headers[2][1])
-        self.test_force = float(self.headers[3][1])
-        self.test_speed = float(self.headers[4][1])
+        self.sample_name = self.headers[3][1]
+        self.weight = float(self.headers[4][1])
+        self.test_force = float(self.headers[5][1])
+        self.test_speed = float(self.headers[6][1])
 
         self.area = math.pi * (math.pow(0.0127, 2))
 
         self.my_data = np.loadtxt(filename, delimiter=",", skiprows=headers_num, quotechar="\"")
 
+        # print(self.my_data)
         # make necessary arrays
         self.time_array = make_array_from_data(self.my_data, 0)
         self.sample_width_array = make_array_from_data(self.my_data, 1)
@@ -219,8 +220,9 @@ class Deflection:
                                                 power_law_offset[0]),
                                             maxfev=10000,
                                             bounds=([0, 0, 0], [np.inf, np.inf, np.inf]),
+                                            check_finite=True,
                                             nan_policy="omit")
-        except RuntimeError:
+        except (RuntimeError, ValueError):
             return -1
         value = [make_array_from_numpy_array(power_law_popt_pcov, 0),
                  make_array_from_numpy_array(power_law_popt_pcov, 1)]
@@ -232,14 +234,18 @@ class Deflection:
     def power_law_calculation(self):
         # pick a start point by the power of DEDUCTION
         end = np.argmax(self.sample_load_array)
-        start = end - int(end / 7)
+        start = end - int(end / 10)
         self.curve_fit_func(start=start,
                             end=end)
-        start_min = int(len(self.deflection_array) / 10)
+        start_min = int(np.argmax(self.sample_load_array) / 10)
+        # print(str(end) + " is the end")
+        # print(str(start) + " is the first start")
+        # print(str(start_min) + " is the minimum start")
         # loop the curve fit
         while True:
             fit = True
-            start = int(start / 6)
+            start = start - int(start / 9)
+            # print(str(start) + " is the start")
             if start < start_min:
                 start = start_min
                 fit = False
@@ -249,12 +255,16 @@ class Deflection:
             if perr_avg == -1:
                 break
             # when perr is greater than the perr of the previous curves end the loop
-            for x in self.perr_popt_pcov_dict.keys():
-                if perr_avg > x:
-                    fit = False
-                    break
+            # for x in self.perr_popt_pcov_dict.keys():
+            #     if perr_avg > x:
+            #         fit = False
+            #         print("average larger")
+            #         break
             if not fit:
                 break
+        # for x in self.perr_popt_pcov_dict.keys():
+        #     print(x)
+        # print("\n")
         min_key = min(self.perr_popt_pcov_dict.keys())
         return self.perr_popt_pcov_dict.get(min_key)
 

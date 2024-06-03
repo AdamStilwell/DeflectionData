@@ -30,7 +30,7 @@ def run(save_file, file_path):
     number_of_sheets = 1
     for filename in file_path:
         my_deflection = Deflection(filename=filename,
-                                   headers_num=8)
+                                   headers_num=10)
         ExcelPrint.worksheet_raw_print(workbook=workbook_class.workbook,
                                        my_deflection=my_deflection)
         ExcelPrint.print_summary_worksheet(worksheet=workbook_class.worksheet_summary,
