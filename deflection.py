@@ -46,7 +46,7 @@ def func_final(x, a, n, b):
 
 
 class Deflection:
-    def __init__(self, filename, headers_num):
+    def __init__(self, filename, headers_num, headers_offset):
         # will find a way to get these from the file headers
         self.headers = []
         with open(filename) as infile:
@@ -55,10 +55,10 @@ class Deflection:
                 self.headers.append(next(reader))
 
         # print(self.headers)
-        self.sample_name = self.headers[3][1]
-        self.weight = float(self.headers[4][1])
-        self.test_force = float(self.headers[5][1])
-        self.test_speed = float(self.headers[6][1])
+        self.sample_name = self.headers[1 + headers_offset][1]
+        self.weight = float(self.headers[2 + headers_offset][1])
+        self.test_force = float(self.headers[3 + headers_offset][1])
+        self.test_speed = float(self.headers[4 + headers_offset][1])
 
         self.area = math.pi * (math.pow(0.0127, 2))
 
