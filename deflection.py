@@ -51,7 +51,7 @@ class Deflection:
         self.headers = []
         with open(filename) as infile:
             reader = csv.reader(infile)
-            for x in range(headers_num):
+            for x in range(headers_num + headers_offset):
                 self.headers.append(next(reader))
 
         # print(self.headers)
@@ -62,7 +62,7 @@ class Deflection:
 
         self.area = math.pi * (math.pow(0.0127, 2))
 
-        self.my_data = np.loadtxt(filename, delimiter=",", skiprows=headers_num, quotechar="\"")
+        self.my_data = np.loadtxt(filename, delimiter=",", skiprows=headers_num + headers_offset, quotechar="\"")
 
         # print(self.my_data)
         # make necessary arrays
@@ -198,30 +198,33 @@ class Deflection:
                 * -1)
 
     def curve_fit_func(self, start, end):
-        self.power_law_first = curve_fit(self.func_first,
+        try:
+            self.power_law_first = curve_fit(self.func_first,
                                          self.h_delta_array[start:end],
                                          self.pressure_array[start:end],
                                          p0=(100, 1),
                                          maxfev=10000,
                                          bounds=([0, 0], [np.inf, np.inf]),
+                                         check_finite=True,
                                          nan_policy="omit")[0]
-        power_law_offset = curve_fit(self.func,
+            power_law_offset = curve_fit(self.func,
                                      self.h_delta_array[start:end],
                                      self.pressure_array[start:end],
                                      p0=self.offset,
                                      maxfev=10000,
                                      bounds=([0], [np.inf]),
+                                     check_finite=True,
                                      nan_policy="omit")[0]
-        try:
+
             power_law_popt_pcov = curve_fit(func_final,
-                                            self.h_delta_array[start:end],
-                                            self.pressure_array[start:end],
-                                            p0=(self.power_law_first[0], self.power_law_first[1],
-                                                power_law_offset[0]),
-                                            maxfev=10000,
-                                            bounds=([0, 0, 0], [np.inf, np.inf, np.inf]),
-                                            check_finite=True,
-                                            nan_policy="omit")
+                                    self.h_delta_array[start:end],
+                                    self.pressure_array[start:end],
+                                    p0=(self.power_law_first[0], self.power_law_first[1],
+                                        power_law_offset[0]),
+                                    maxfev=10000,
+                                    bounds=([0, 0, 0], [np.inf, np.inf, np.inf]),
+                                    check_finite=True,
+                                    nan_policy="omit")
         except (RuntimeError, ValueError):
             return -1
         value = [make_array_from_numpy_array(power_law_popt_pcov, 0),
@@ -237,14 +240,11 @@ class Deflection:
         start = end - int(end / 10)
         self.curve_fit_func(start=start,
                             end=end)
-        start_min = int(np.argmax(self.sample_load_array) / 10)
-        # print(str(end) + " is the end")
-        # print(str(start) + " is the first start")
-        # print(str(start_min) + " is the minimum start")
+        start_min = int(np.argmax(self.sample_load_array) / 6)
         # loop the curve fit
         while True:
             fit = True
-            start = start - int(start / 9)
+            start = start - int(start / 30)
             # print(str(start) + " is the start")
             if start < start_min:
                 start = start_min
@@ -254,17 +254,8 @@ class Deflection:
                                            end=end)
             if perr_avg == -1:
                 break
-            # when perr is greater than the perr of the previous curves end the loop
-            # for x in self.perr_popt_pcov_dict.keys():
-            #     if perr_avg > x:
-            #         fit = False
-            #         print("average larger")
-            #         break
             if not fit:
                 break
-        # for x in self.perr_popt_pcov_dict.keys():
-        #     print(x)
-        # print("\n")
         min_key = min(self.perr_popt_pcov_dict.keys())
         return self.perr_popt_pcov_dict.get(min_key)
 

@@ -29,9 +29,13 @@ def run(save_file, file_path):
                                                number_of_samples=len(file_path))
     number_of_sheets = 1
     for filename in file_path:
+        if filename.split('/')[-1].split('_')[0] == "Specimen":
+            header = 0
+        else:
+            header = 2
         my_deflection = Deflection(filename=filename,
                                    headers_num=8,
-                                   headers_offset=2)
+                                   headers_offset=header)
         ExcelPrint.worksheet_raw_print(workbook=workbook_class.workbook,
                                        my_deflection=my_deflection)
         ExcelPrint.print_summary_worksheet(worksheet=workbook_class.worksheet_summary,
