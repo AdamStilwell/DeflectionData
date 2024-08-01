@@ -153,7 +153,7 @@ class Deflection:
             else:
                 i += 1
         if i == len(self.stress_strain_array):
-            return i-1
+            return i - 1
 
     def find_pull_off_final(self):
         for x in range(self.pull_off_start, len(self.pressure_array)):
@@ -162,6 +162,7 @@ class Deflection:
             else:
                 return len(self.pressure_array)
 
+    # this function determines the position in the array closest to 1/10th of the max pressure
     def find_pull_off_end(self):
         target = self.detach_pressure / 10
         i = np.argmin(self.pressure_array) + 1
@@ -204,31 +205,31 @@ class Deflection:
     def curve_fit_func(self, start, end):
         try:
             self.power_law_first = curve_fit(self.func_first,
+                                             self.h_delta_array[start:end],
+                                             self.pressure_array[start:end],
+                                             p0=(100, 1),
+                                             maxfev=10000,
+                                             bounds=([0, 0], [np.inf, np.inf]),
+                                             check_finite=True,
+                                             nan_policy="omit")[0]
+            power_law_offset = curve_fit(self.func,
                                          self.h_delta_array[start:end],
                                          self.pressure_array[start:end],
-                                         p0=(100, 1),
+                                         p0=self.offset,
                                          maxfev=10000,
-                                         bounds=([0, 0], [np.inf, np.inf]),
+                                         bounds=([0], [np.inf]),
                                          check_finite=True,
                                          nan_policy="omit")[0]
-            power_law_offset = curve_fit(self.func,
-                                     self.h_delta_array[start:end],
-                                     self.pressure_array[start:end],
-                                     p0=self.offset,
-                                     maxfev=10000,
-                                     bounds=([0], [np.inf]),
-                                     check_finite=True,
-                                     nan_policy="omit")[0]
 
             power_law_popt_pcov = curve_fit(func_final,
-                                    self.h_delta_array[start:end],
-                                    self.pressure_array[start:end],
-                                    p0=(self.power_law_first[0], self.power_law_first[1],
-                                        power_law_offset[0]),
-                                    maxfev=10000,
-                                    bounds=([0, 0, 0], [np.inf, np.inf, np.inf]),
-                                    check_finite=True,
-                                    nan_policy="omit")
+                                            self.h_delta_array[start:end],
+                                            self.pressure_array[start:end],
+                                            p0=(self.power_law_first[0], self.power_law_first[1],
+                                                power_law_offset[0]),
+                                            maxfev=10000,
+                                            bounds=([0, 0, 0], [np.inf, np.inf, np.inf]),
+                                            check_finite=True,
+                                            nan_policy="omit")
         except (RuntimeError, ValueError):
             return -1
         value = [make_array_from_numpy_array(power_law_popt_pcov, 0),
