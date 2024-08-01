@@ -165,6 +165,8 @@ class Deflection:
     def find_pull_off_end(self):
         target = self.detach_pressure / 10
         i = np.argmin(self.pressure_array) + 1
+        if i == len(self.pressure_array):
+            i -= 1
         pull_off = 0
         min_diff = abs(target - self.pressure_array[i])
         for x in range((np.argmin(self.pressure_array) + 1), self.pull_off_final):
