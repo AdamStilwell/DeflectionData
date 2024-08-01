@@ -13,7 +13,7 @@ def upload():
     if entry1.get() == "":
         save_file = "Results.xlsx"
     else:
-        save_file = entry1.get() + ".xlsx"
+        save_file = entry1.get() + " Deflection Results.xlsx"
     file_path = filedialog.askopenfilenames(filetypes=[("csv file", ".csv")])
     root.after(0, run(save_file=save_file, file_path=file_path))
 
