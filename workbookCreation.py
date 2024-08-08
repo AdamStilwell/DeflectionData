@@ -42,6 +42,7 @@ class Workbook:
         self.workbook = xlsxwriter.Workbook(save_file_location + "/" + save_file)
         # create summary worksheet with all its headings
         self.worksheet_summary = self.workbook.add_worksheet("Summary")
+        self.worksheet_summary.freeze_panes(1,0)
         self.worksheet_summary.set_column("A:A", 15)
         headers_array = ["Sample name", "Peak Load (N)", "Thickness (mm)", "Density (g/cc)",
                          "G1c (J/m2)", "Peak Detach Pressure (MPa)", "Maximum % Deflection",
