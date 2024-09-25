@@ -45,7 +45,8 @@ class Workbook:
         self.worksheet_summary.freeze_panes(1,0)
         self.worksheet_summary.set_column("A:A", 15)
         headers_array = ["Sample name", "Peak Load (N)", "Thickness (mm)", "Density (g/cc)",
-                         "G1c (J/m2)", "Peak Detach Pressure (MPa)", "Maximum % Deflection",
+                         "G1c (J/m2)", "Peak Detach Pressure (MPa)", "Maximum % Deflection", "Deflection @ 10 psi",
+                         "Deflection @ 20 psi", "Deflection @ 30 psi",
                          "Minimum Gap (mm)", "Distance to Break (mm)", "Amplitude",
                          "Power Law Index", "Offset", "FTA-4 equiv.", "G'20 C", "G' 200 C", "Experiment Variable 1",
                          "Experiment Variable 2"]

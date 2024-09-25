@@ -154,13 +154,16 @@ def print_summary_worksheet(worksheet, my_deflection, number_of_sheets):
     worksheet.write(number_of_sheets, 4, my_deflection.g1c)
     worksheet.write(number_of_sheets, 5, my_deflection.detach_pressure)
     worksheet.write(number_of_sheets, 6, my_deflection.max_deflection)
-    worksheet.write(number_of_sheets, 7, my_deflection.minimum_gap)
-    worksheet.write(number_of_sheets, 8, my_deflection.strain_to_break)
+    worksheet.write(number_of_sheets, 7, my_deflection.ten_psi)
+    worksheet.write(number_of_sheets, 8, my_deflection.twenty_psi)
+    worksheet.write(number_of_sheets, 9, my_deflection.thirty_psi)
+    worksheet.write(number_of_sheets, 10, my_deflection.minimum_gap)
+    worksheet.write(number_of_sheets, 11, my_deflection.strain_to_break)
 
     # power law headings
     # "Amplitude"
-    worksheet.write(number_of_sheets, 9, my_deflection.power_law_values[0][0])
+    worksheet.write(number_of_sheets, 12, my_deflection.power_law_values[0][0])
     # "Power Law Index"
-    worksheet.write(number_of_sheets, 10, my_deflection.power_law_values[0][1])
+    worksheet.write(number_of_sheets, 13, my_deflection.power_law_values[0][1])
     # "Offset"
-    worksheet.write(number_of_sheets, 11, my_deflection.power_law_values[0][2])
+    worksheet.write(number_of_sheets, 14, my_deflection.power_law_values[0][2])

@@ -1,3 +1,4 @@
+import numpy
 import numpy as np
 import csv
 import math
@@ -90,6 +91,11 @@ class Deflection:
         self.detach_pressure = get_minimum(self.pressure_array)
         self.stress_strain_array = self.make_stress_strain_array()
 
+        # psi stuff
+        self.ten_psi = self.find_psi_values(10)
+        self.twenty_psi = self.find_psi_values(20)
+        self.thirty_psi = self.find_psi_values(30)
+
         # pull off stuff
         self.pull_off_start = self.find_pull_off_start()
         self.pull_off_final = self.find_pull_off_final()
@@ -154,6 +160,19 @@ class Deflection:
                 i += 1
         if i == len(self.stress_strain_array):
             return i - 1
+
+    def find_psi_values(self, psi):
+        target = psi
+        avg_array = []
+        i = 0
+        for x in range(len(self.psi_array)):
+            if self.psi_array[i] > (psi + 0.5):
+                break
+            else:
+                if self.psi_array[i] >= target:
+                    avg_array.append(self.deflection_array[i])
+                i += 1
+        return numpy.average(avg_array)
 
     def find_pull_off_final(self):
         for x in range(self.pull_off_start, len(self.pressure_array)):
