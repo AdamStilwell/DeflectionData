@@ -2,6 +2,8 @@ import customtkinter as ctk
 from tkinter import filedialog
 import os
 
+import shutil
+
 from DeflectionData.deflection import Deflection
 import ExcelPrint
 import workbookCreation
@@ -16,6 +18,9 @@ def upload():
         save_file = entry1.get() + " Deflection Results.xlsx"
     file_path = filedialog.askopenfilenames(filetypes=[("csv file", ".csv")])
     root.after(0, run(save_file=save_file, file_path=file_path))
+    shutil.copy(save_file_location + "\\" + save_file,
+                "C:\\Users\\wj9618\\OneDrive - DuPont\\Documents\\Deflection "
+                "Data\\Instron Data\\TO EMAIL")
 
 
 def save_location():
