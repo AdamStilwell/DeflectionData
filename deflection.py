@@ -1,4 +1,3 @@
-import numpy
 import numpy as np
 import csv
 import math
@@ -172,7 +171,7 @@ class Deflection:
                 if self.psi_array[i] >= target:
                     avg_array.append(self.deflection_array[i])
                 i += 1
-        return numpy.average(avg_array)
+        return np.average(avg_array)
 
     def find_pull_off_final(self):
         for x in range(self.pull_off_start, len(self.pressure_array)):
