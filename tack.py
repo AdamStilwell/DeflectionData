@@ -1,7 +1,6 @@
 import numpy as np
 import csv
 import math
-from scipy.optimize import curve_fit
 
 
 def make_array_from_data(data, num):
@@ -41,11 +40,7 @@ def compile_select_data(*arrays):
     return array
 
 
-def func_final(x, a, n, b):
-    return a * (x - b) ** n
-
-
-class Deflection:
+class Tack:
     def __init__(self, filename, headers_num, headers_offset):
         # will find a way to get these from the file headers
         self.headers = []
@@ -56,7 +51,6 @@ class Deflection:
 
         # print(self.headers)
         self.sample_name = self.headers[1 + headers_offset][1]
-        self.weight = float(self.headers[2 + headers_offset][1])
         self.test_force = float(self.headers[3 + headers_offset][1])
         self.test_speed = float(self.headers[4 + headers_offset][1])
 
@@ -72,13 +66,11 @@ class Deflection:
         self.my_data = None
         self.pressure_array = self.make_pressure_array()
         self.psi_array = self.make_psi_array()
-        self.h_delta_array = self.make_h_delta_array()
         self.time_step = self.time_array[2] - self.time_array[1]
 
         # sample size stuff
         self.minimum_gap = get_minimum(self.sample_width_array)
         self.width = self.find_sample_width()
-        self.density = self.calculate_density()
         self.max_load = get_maximum(self.sample_load_array)
 
         # deflection stuff
@@ -89,11 +81,6 @@ class Deflection:
         self.pressure_at_max_deflection = get_value_at_maximum(self.pressure_array, self.deflection_array)
         self.detach_pressure = get_minimum(self.pressure_array)
         self.stress_strain_array = self.make_stress_strain_array()
-
-        # psi stuff
-        self.ten_psi = self.find_psi_values(10)
-        self.twenty_psi = self.find_psi_values(20)
-        self.thirty_psi = self.find_psi_values(30)
 
         # pull off stuff
         self.pull_off_start = self.find_pull_off_start()
@@ -106,19 +93,7 @@ class Deflection:
                                 self.sample_width_array[self.pull_off_start])
         self.g1c = self.calculate_g1c()
 
-        # power law stuff
-        self.offset = self.test_speed / self.width / 1000
-        self.power_law_first = []
-        self.perr_popt_pcov_dict = {}
-        self.power_law_values = self.power_law_calculation()
-
         self.full_data_array = self.compile_data()
-
-    def func_first(self, x, a, n):
-        return a * (x - self.offset) ** n
-
-    def func(self, x, b):
-        return self.power_law_first[0] * (x - b) ** self.power_law_first[1]
 
     def make_pressure_array(self):
         array = []
@@ -142,12 +117,6 @@ class Deflection:
         array = []
         for i in range(len(self.deflection_array)):
             array.append(self.pressure_array[i] * 1000000 * self.deflection_array[i] / 100)
-        return array
-
-    def make_h_delta_array(self):
-        array = []
-        for x in self.sample_width_array:
-            array.append(self.test_speed / x / 1000)
         return array
 
     def find_pull_off_start(self):
@@ -215,81 +184,16 @@ class Deflection:
                 i += 1
         return self.sample_width_array[width]
 
-    def calculate_density(self):
-        return self.weight / (self.area * self.width) * 0.001
-
     def calculate_g1c(self):
         return (sum(self.stress_strain_array[self.pull_off_start:self.pull_off_ends])
                 * (self.test_speed / 1000000)
                 * self.time_step
                 * -1)
 
-    def curve_fit_func(self, start, end):
-        try:
-            self.power_law_first = curve_fit(self.func_first,
-                                             self.h_delta_array[start:end],
-                                             self.pressure_array[start:end],
-                                             p0=(100, 1),
-                                             maxfev=10000,
-                                             bounds=([0, 0], [np.inf, np.inf]),
-                                             check_finite=True,
-                                             nan_policy="omit")[0]
-            power_law_offset = curve_fit(self.func,
-                                         self.h_delta_array[start:end],
-                                         self.pressure_array[start:end],
-                                         p0=self.offset,
-                                         maxfev=10000,
-                                         bounds=([0], [np.inf]),
-                                         check_finite=True,
-                                         nan_policy="omit")[0]
-
-            power_law_popt_pcov = curve_fit(func_final,
-                                            self.h_delta_array[start:end],
-                                            self.pressure_array[start:end],
-                                            p0=(self.power_law_first[0], self.power_law_first[1],
-                                                power_law_offset[0]),
-                                            maxfev=10000,
-                                            bounds=([0, 0, 0], [np.inf, np.inf, np.inf]),
-                                            check_finite=True,
-                                            nan_policy="omit")
-        except (RuntimeError, ValueError):
-            return -1
-        value = [make_array_from_numpy_array(power_law_popt_pcov, 0),
-                 make_array_from_numpy_array(power_law_popt_pcov, 1)]
-        perr = np.sqrt(np.diag(power_law_popt_pcov[1]))
-        perr_avg = np.average(perr)
-        self.perr_popt_pcov_dict.update({perr_avg: value})
-        return perr_avg
-
-    def power_law_calculation(self):
-        # pick a start point by the power of DEDUCTION
-        end = np.argmax(self.sample_load_array)
-        start = end - int(end / 10)
-        self.curve_fit_func(start=start,
-                            end=end)
-        start_min = int(np.argmax(self.sample_load_array) / 6)
-        # loop the curve fit
-        while True:
-            fit = True
-            start = start - int(start / 30)
-            # print(str(start) + " is the start")
-            if start < start_min:
-                start = start_min
-                fit = False
-
-            perr_avg = self.curve_fit_func(start=start,
-                                           end=end)
-            if perr_avg == -1:
-                break
-            if not fit:
-                break
-        min_key = min(self.perr_popt_pcov_dict.keys())
-        return self.perr_popt_pcov_dict.get(min_key)
-
     def compile_data(self):
         array = [self.time_array, self.sample_width_array, self.sample_load_array, self.deflection_array,
                  self.pressure_array, self.psi_array, self.stress_strain_array, self.h_delta_array]
-        more_headers = ["Deflection", "Pressure", "PSI", "Stress * strain", "h_dot/h"]
+        more_headers = ["Tack", "Pressure", "PSI", "Stress * strain", "h_dot/h"]
         for x in more_headers:
             self.headers[-2].append(x)
         return array
