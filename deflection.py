@@ -94,6 +94,7 @@ class Deflection:
         self.ten_psi = self.find_psi_values(10)
         self.twenty_psi = self.find_psi_values(20)
         self.thirty_psi = self.find_psi_values(30)
+        self.fifty_psi = self.find_psi_values(50)
 
         # pull off stuff
         self.pull_off_start = self.find_pull_off_start()

@@ -1,3 +1,5 @@
+import customtkinter
+
 import customtkinter as ctk
 from tkinter import filedialog
 import os
@@ -7,6 +9,10 @@ import shutil
 from DeflectionData.deflection import Deflection
 import ExcelPrint
 import workbookCreation
+
+# import tack
+# import tack_print
+# import tack_Workbook
 
 save_file_location = "C:\\Users\\" + os.path.expanduser('~').split("\\")[-1] + "\\OneDrive - DuPont\\Desktop"
 
@@ -90,6 +96,9 @@ button.pack(pady=12, padx=10)
 button2 = ctk.CTkButton(master=frame, text="Select Samples", command=upload)
 button2.pack(pady=12, padx=10)
 
+check_var = customtkinter.StringVar(value="off")
+button3 = ctk.CTkCheckBox(master=frame, text="Tack?", variable=check_var)
+button3.pack(pady=12, padx=10)
+
 if __name__ == "__main__":
     root.mainloop()
-
